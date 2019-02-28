@@ -3061,18 +3061,21 @@ form#vstobjects.suspended {
   line-height: 28px;
   padding-left: 7px;
   float: left;
-  width: 74px;
+  width: 110px;
 /*  visibility: hidden;*/
   -webkit-transition: width .2s ease-out;
   -moz-transition: width .2s ease-out;
   -o-transition: width .2s ease-out;
   transition: width .2s ease-out;
 }
+.lang-ru .search-input{
+  width: 74px;
+}
 .lang-ru .search-input.activated{
   width: 70px;
 }
 .search-input.activated{
-  width: 130px;
+  width: 110px;
   visibility: visible;
 }
 .search-input:focus {
