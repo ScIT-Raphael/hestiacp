@@ -572,7 +572,7 @@ html {
 }
 
 body {
-  font-family: arial;
+  font-family: Oxygen, Arial, Arial, Helvetica, sans-serif;
   overflow-x: hidden;
   font-size: 14px;
   height: 100%;
@@ -2431,7 +2431,7 @@ label:hover {
   border: 1px solid #cfcfcf;
   border-radius: 0px;
   color: #555;
-  font-family: Arial;
+  font-family: Oxygen, Arial, Helvetica, sans-serif;
   font-size: 19px;
   height: 28px;
   margin: 2px 6px 0 0;
@@ -2468,7 +2468,7 @@ label:hover {
   border: 1px solid #ccc;
   border-radius: 0;
   color: #555;
-  font-family: Arial,Helvetica,sans-serif;
+  font-family: Oxygen, Arial, Helvetica, sans-serif;
   font-size: 19px;
   font-weight: normal;
   height: 43px;
@@ -2539,7 +2539,7 @@ a.vst-text:active b{
   padding: 5px;
   width: 560px;
   height: 90px;
-  font-family:Arial, Helvetica, sans-serif;
+  font-family: Oxygen, Arial, Helvetica, sans-serif;
   padding: 9px 1px 6px 14px;
   font-weight: normal;
 }
@@ -2558,7 +2558,7 @@ a.vst-text:active b{
   font-size: 13px;
   width: 630px;
   height: 300px;
-  font-family:"Lucida Console", Monaco, monospace;
+  font-family: "Lucida Console", Monaco, monospace;
   white-space: pre;
 }
 .vst-textinput.short {
@@ -2893,7 +2893,7 @@ a.button.cancel {
 .login {
   background-color: #fff;
   box-shadow: 0 2px 6px rgba(100, 100, 100, 0.3);
-  font-family: Arial,Helvetica,sans-serif;
+  font-family: Oxygen, Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
   text-align: left;
