@@ -2399,10 +2399,10 @@ body.mobile .l-icon-shortcuts {
   cursor: pointer;
 }
 .step-top {
-  padding-top: 42px;
+  padding-top: 24px;
 }
 .step-top-small {
-  padding-top: 22px;
+  padding-top: 18px;
 }
 .jump-top {
   margin-top: -60px;
@@ -3162,7 +3162,7 @@ form#vstobjects.suspended {
   padding: 5px 20px;
 }
 .shortcuts ul li.step-top {
-  padding-top: 30px;
+  padding-top: 24px;
 }
 .shortcuts ul li span {
   color: #48F4EF;
