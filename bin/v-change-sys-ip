@@ -19,7 +19,6 @@ NEW_IP=$2
 IPFILE_OLD=/usr/local/hestia/data/ips/$OLD_IP
 IPFILE_NEW=/usr/local/hestia/data/ips/$NEW_IP
 HAVE_APACHE2=1
-HAVE_HTTPD=0
 HAVE_NGINX=1
 
 #----------------------------------------------------------#
@@ -92,16 +91,6 @@ fi
                 fi
         fi
 
-        if [ "${HAVE_HTTPD}" -eq 1 ]; then
-                if [ -e /etc/httpd/conf.d/${OLD_IP}.conf ]; then
-                        change_ip /etc/httpd/conf.d/${OLD_IP}.conf
-                        mv -f /etc/httpd/conf.d/$OLD_IP.conf /etc/httpd/conf.d/${NEW_IP}.conf
-                fi
-                if [ -e /etc/httpd/conf.d/mod_extract_forwarded.conf ]; then
-                        change_ip /etc/httpd/conf.d/mod_extract_forwarded.conf 
-                fi
-        fi
-
         # Update NGINX Configuration
         if [ "${HAVE_NGINX}" -eq 1 ]; then
                 if [ -e /etc/nginx/conf.d/${OLD_IP}.conf ]; then
@@ -150,15 +139,6 @@ for i in `ls $USERDIR`; do
                 done;
         fi
 
-        # HTTPD (alternative name for Apache service)
-        if [ "${HAVE_HTTPD}" -eq 1 ]; then
-                for j in `ls /home/$i/conf/web/*.httpd.conf`; do
-                {
-                        change_ip $j
-                };
-                done;
-        fi
-
         # NGINX
         if [ "${HAVE_NGINX}" -eq 1 ]; then
                 for j in `ls /home/$i/conf/web/*.nginx.conf`; do
@@ -198,9 +178,6 @@ netplan apply
 # Restart server processes
 if [ "${HAVE_APACHE2}" -eq 1 ]; then
    systemctl restart apache2
-fi
-if [ "${HAVE_HTTPD}" -eq 1 ]; then
-   systemctl restart httpd
 fi
 if [ "${HAVE_NGINX}" -eq 1 ]; then
    systemctl restart nginx
