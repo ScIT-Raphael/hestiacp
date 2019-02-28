@@ -1,4 +1,5 @@
 #!/bin/bash
+release=`lsb_release -s -r`
 
 # Run triggers only on updates
 if [ ! -e "/usr/local/hestia/data/users/admin" ]; then
@@ -59,8 +60,13 @@ if [ "$DNS_SYSTEM" = 'bind9' ] && [ ! -f /etc/apparmor.d/local/usr.sbin.named ];
         systemctl restart apparmor
 fi
 
+# Upgrade default page templates
+rm -rf /var/www/html/*
+cp -rf /usr/local/hestia/install/ubuntu/$release/templates/web/* /usr/local/hestia/data/templates/web/
+cp -rf /usr/local/hestia/install/ubuntu/$release/templates/web/unassigned/* /var/www/html/ 
+
 # Rebuild users on upgrade
-release=`lsb_release -s -r`
+
 for f in /home/*; do
     if [ -d ${f} ]; then
         username=`echo $f | sed -e 's|/home/||g'`
