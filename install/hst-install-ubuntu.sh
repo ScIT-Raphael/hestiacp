@@ -957,8 +957,8 @@ cp -rf $hestiacp/firewall $HESTIA/data/
 $HESTIA/bin/v-change-sys-hostname $servername > /dev/null 2>&1
 
 # Generating SSL certificate
-$HESTIA/bin/v-generate-ssl-cert $(hostname) $email 'US' 'California' \
-     'San Francisco' 'Hestia Control Panel' 'IT' > /tmp/hst.pem
+$HESTIA/bin/v-generate-ssl-cert $(hostname) $email 'CA' 'Nova Scotia' \
+     'Halifax' 'Hestia Control Panel' 'IT' > /tmp/hst.pem
 
 # Parsing certificate file
 crt_end=$(grep -n "END CERTIFICATE-" /tmp/hst.pem |cut -f 1 -d:)
