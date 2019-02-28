@@ -57,4 +57,15 @@ fi
 if [ "$DNS_SYSTEM" = 'bind9' ] && [ ! -f /etc/apparmor.d/local/usr.sbin.named ]; then
         echo "/home/** rwm," >> /etc/apparmor.d/local/usr.sbin.named 2> /dev/null
 fi
+
+# Rebuild users on upgrade
+release=`lsb_release -s -r`
+for f in /home/*; do
+    if [ -d ${f} ]; then
+        username=`echo $f | sed -e 's|/home/||g'`
+        echo Rebuilding User: $username
+        /usr/local/hestia/bin/v-rebuild-user $username
+    fi
+done
+
 exit 0
