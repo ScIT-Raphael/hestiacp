@@ -5,7 +5,7 @@ BUILD_DIR='/root'
 INSTALL_DIR='/usr/local/hestia'
 
 # Set git repository raw path
-GIT_REP='https://raw.githubusercontent.com/hestiacp/hestiacp/master/src/deb'
+GIT_REP='https://raw.githubusercontent.com/kristankenney/hestiacp/master/src/deb'
 
 # Set Version for compiling
 HESTIA_V='0.9.8-26_amd64'
@@ -16,7 +16,7 @@ ZLIB_V='1.2.11'
 PHP_V='7.3.2'
 
 # Generate Links for sourcecode
-HESTIA='https://github.com/hestiacp/hestiacp/archive/master.zip'
+HESTIA='https://github.com/kristankenney/hestiacp/archive/master.zip'
 NGINX='https://nginx.org/download/nginx-'$NGINX_V'.tar.gz'
 OPENSSL='https://www.openssl.org/source/openssl-'$OPENSSL_V'.tar.gz'
 PCRE='https://ftp.pcre.org/pub/pcre/pcre-'$PCRE_V'.tar.gz'
