@@ -1,23 +1,23 @@
-### Operating System (OS/VERSION):
-
-Type here, e.g. Debian 9
-
-### HestiaCP Version:
-
-Type here, e.g. 1.01234
-
-### Installed Software (what you got with the installer):
-
-Type here, e.g. Apache, Nginx, PHP-FPM, MySQL
+### Behavior:
+Type here... (e.g. DNS does not respond properly)
 
 ### Steps to Reproduce:
+1. Step 1
+2. Step 2
+3. Step 3
+4. etc...
 
-Type here, e.g. install HestiaCP and type rm -rf / --no-preserve-root
+### Expected Behavior:
+Type here... (e.g. DNS does not respond properly)
 
-### Related Issues/Forum Threads:
+### Related Issues:
+If you have found any other reports or issues that may be related to this report, please let us know.
 
-Found anything that might be related to this? It might help us find the cause.
+### Operating System and Version:
+Type here... (e.g. Ubuntu 18.04 LTS)
 
-### Other Notes:
+### Hestia Control Panel Version:
+Type here... (e.g. 0.9.8-25)
 
-Anything else you think we should know?
+### Installed Software:
+Type here... (e.g. Apache, NGINX, MariaDB, BIND, etc.)
