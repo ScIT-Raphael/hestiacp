@@ -33,8 +33,8 @@ software="apache2 apache2.2-common apache2-suexec-custom apache2-utils
     exim4-daemon-heavy expect fail2ban flex ftp git idn imagemagick
     libapache2-mod-fcgid libapache2-mod-php libapache2-mod-rpaf
     libapache2-mod-ruid2 lsof mc mariadb-client mariadb-common mariadb-server nginx
-    ntpdate php php-cgi php-common php-curl php-imap php-apcu phpmyadmin php-mysql
-    phppgadmin php-pgsql postgresql postgresql-contrib proftpd-basic quota
+    ntpdate php php-cgi php-common php-curl php-imap php-apcu php-imagick phpmyadmin
+    php-mysql phppgadmin php-pgsql postgresql postgresql-contrib proftpd-basic quota
     roundcube-core roundcube-mysql roundcube-plugins rrdtool rssh spamassassin sudo
     hestia hestia-nginx hestia-php vim-common vsftpd webalizer whois zip"
 
