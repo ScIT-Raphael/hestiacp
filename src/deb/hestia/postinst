@@ -56,6 +56,7 @@ fi
 # Fix named rule for AppArmor - https://goo.gl/SPqHdq
 if [ "$DNS_SYSTEM" = 'bind9' ] && [ ! -f /etc/apparmor.d/local/usr.sbin.named ]; then
         echo "/home/** rwm," >> /etc/apparmor.d/local/usr.sbin.named 2> /dev/null
+        systemctl restart apparmor
 fi
 
 # Rebuild users on upgrade
@@ -67,5 +68,10 @@ for f in /home/*; do
         /usr/local/hestia/bin/v-rebuild-user $username
     fi
 done
+
+# Restart services
+systemctl restart apache2
+systemctl restart nginx
+systemctl restart hestia
 
 exit 0
