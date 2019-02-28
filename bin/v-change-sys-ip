@@ -113,12 +113,17 @@ fi
         # Update HOSTS file
         change_ip /etc/hosts
 
+        # Update Firewall rules
+        change_ip $HESTIA/data/firewall/*.conf
+        $BIN/v-update-firewall
+
         # Update Netplan Configuration
         for config in `ls /etc/netplan`; do
         {
                 change_ip /etc/netplan/$config
         };
         done;
+
 
 # Update User Configuration
 for i in `ls $USERDIR`; do
