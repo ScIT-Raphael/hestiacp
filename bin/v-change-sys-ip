@@ -1,0 +1,205 @@
+#!/bin/sh
+
+# Script to change IP addresses on a HestiaCP server.
+# OPTIONS: [OLDIP] [NEWIP] 
+
+# TODO: Refactor code and implement OS version check
+
+#----------------------------------------------------------#
+#                        Variables                         #
+#----------------------------------------------------------#
+
+MYUID=`/usr/bin/id -u`
+DATE=`date '+%F %X'`
+BIN=`echo $0 | awk -F/ '{print $NF}'`
+LOG=/var/log/hestia/system.log
+USERDIR=/usr/local/hestia/data/users
+OLD_IP=$1
+NEW_IP=$2
+IPFILE_OLD=/usr/local/hestia/data/ips/$OLD_IP
+IPFILE_NEW=/usr/local/hestia/data/ips/$NEW_IP
+HAVE_APACHE2=1
+HAVE_HTTPD=0
+HAVE_NGINX=1
+
+#----------------------------------------------------------#
+#                        Validation                        #
+#----------------------------------------------------------#
+
+if [ "$MYUID" != 0 ]; then
+        echo "This script must be run as root.";
+        exit 0;
+fi
+
+if [ $# != 2 ] && [ $# != 3 ]; then
+        echo "Usage:";
+        echo "$0 [OLDIP] [NEWIP] [<file>]";
+        exit 0;
+fi
+
+#----------------------------------------------------------#
+#                        Functions                         #
+#----------------------------------------------------------#
+
+log()
+{
+        echo -e "$1";
+        echo -e "$1" >> $LOG;
+}
+
+change_ip()
+{
+        if [ ! -e $1 ]; then
+                log "Unable to locate file $1 to change IP, skipping...";
+                return;
+        fi
+
+        TEMP="perl -pi -e 's/${OLD_IP}/${NEW_IP}/g' $1"
+        eval $TEMP;
+
+        log "$DATE $BIN $1\t: $OLD_IP -> $NEW_IP";
+}
+
+#----------------------------------------------------------#
+#                        Script                            #
+#----------------------------------------------------------#
+
+if [ $# = 3 ]; then
+        change_ip $3;
+        exit 0;
+fi
+
+if [ ! -e $IPFILE_OLD ]; then
+        echo -n "$IPFILE_OLD does not exist.  Do you want to continue anyway? (y/n) : ";
+        read YESNO;
+        if [ "$YESNO" != "y" ]; then
+                exit 0;
+        fi
+else
+        mv -f $IPFILE_OLD $IPFILE_NEW
+        log "$DATE $IPFILE_OLD: $OLD_IP -> $NEW_IP";
+fi
+
+# Update System Configuration
+        # Update Apache Configuration
+        if [ "${HAVE_APACHE2}" -eq 1 ]; then
+                if [ -e /etc/apache2/conf.d/${OLD_IP}.conf ]; then
+                        change_ip /etc/apache2/conf.d/${OLD_IP}.conf
+                        mv -f /etc/apache2/conf.d/$OLD_IP.conf /etc/apache2/conf.d/${NEW_IP}.conf
+                fi
+                if [ -e /etc/apache2/conf.d/mod_extract_forwarded.conf ]; then
+                        change_ip /etc/apache2/conf.d/mod_extract_forwarded.conf 
+                fi
+        fi
+
+        if [ "${HAVE_HTTPD}" -eq 1 ]; then
+                if [ -e /etc/httpd/conf.d/${OLD_IP}.conf ]; then
+                        change_ip /etc/httpd/conf.d/${OLD_IP}.conf
+                        mv -f /etc/httpd/conf.d/$OLD_IP.conf /etc/httpd/conf.d/${NEW_IP}.conf
+                fi
+                if [ -e /etc/httpd/conf.d/mod_extract_forwarded.conf ]; then
+                        change_ip /etc/httpd/conf.d/mod_extract_forwarded.conf 
+                fi
+        fi
+
+        # Update NGINX Configuration
+        if [ "${HAVE_NGINX}" -eq 1 ]; then
+                if [ -e /etc/nginx/conf.d/${OLD_IP}.conf ]; then
+                        change_ip /etc/nginx/conf.d/${OLD_IP}.conf
+                        mv -f /etc/nginx/conf.d/$OLD_IP.conf /etc/nginx/conf.d/${NEW_IP}.conf
+                fi
+        fi
+
+        # Update HOSTS file
+        change_ip /etc/hosts
+
+        # Update Netplan Configuration
+        for config in `ls /etc/netplan`; do
+        {
+                change_ip /etc/netplan/$config
+        };
+        done;
+
+# Update User Configuration
+for i in `ls $USERDIR`; do
+{
+        if [ ! -d $USERDIR/$i ]; then
+                continue;
+        fi
+        
+        # Update files at root of user directory
+        if [ -e $USERDIR/$i/web.conf ]; then
+                change_ip $USERDIR/$i/web.conf
+        fi
+        if [ -e $USERDIR/$i/dns.conf ]; then
+                change_ip $USERDIR/$i/dns.conf
+        fi
+
+        # Update files within subdirectories
+        # Apache
+        if [ "${HAVE_APACHE2}" -eq 1 ]; then
+                for j in `ls /home/$i/conf/web/*.apache2.conf`; do
+                {
+                        change_ip $j
+                };
+                done;
+        fi
+
+        # HTTPD (alternative name for Apache service)
+        if [ "${HAVE_HTTPD}" -eq 1 ]; then
+                for j in `ls /home/$i/conf/web/*.httpd.conf`; do
+                {
+                        change_ip $j
+                };
+                done;
+        fi
+
+        # NGINX
+        if [ "${HAVE_NGINX}" -eq 1 ]; then
+                for j in `ls /home/$i/conf/web/*.nginx.conf`; do
+                {
+                        change_ip $j
+                };
+                done;
+        fi
+
+        # DNS Configuration Files
+        if [ -e $USERDIR/$i/dns/*.conf ]; then
+                for j in `ls $USERDIR/$i/dns/*.conf`; do
+                {
+                        change_ip $j
+                };
+                done;
+        fi
+
+        # DNS Databases
+        if [ -e /home/$i/conf/dns/*.db ]; then
+                for j in `ls /home/$i/conf/dns/*.db`; do
+                {
+                        change_ip $j
+                };
+                done;
+        fi
+
+};
+done;
+
+echo "Server IP address has been changed from $OLD_IP to $NEW_IP successfully.";
+echo "You will now be disconnected from this session. Please reconnect using $NEW_IP."
+
+# Apply new IP address to network adapter
+netplan apply
+
+# Restart server processes
+if [ "${HAVE_APACHE2}" -eq 1 ]; then
+   systemctl restart apache2
+fi
+if [ "${HAVE_HTTPD}" -eq 1 ]; then
+   systemctl restart httpd
+fi
+if [ "${HAVE_NGINX}" -eq 1 ]; then
+   systemctl restart nginx
+fi
+
+# Restart HestiaCP
+systemctl restart hestia
