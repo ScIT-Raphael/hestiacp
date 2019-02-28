@@ -673,7 +673,7 @@ input[type="checkbox"] {
   position: fixed;
   width: 100%;
   z-index: 100;
-  height: 34px
+  height: 34px;
 }
 .l-header a {
   font-size: 12px;
@@ -1453,7 +1453,6 @@ div.l-content > div.l-separator:nth-of-type(4) {
 
 .l-unit__date {
   font-size: 12px;
-  letter-spacing: 1px;
   margin-top: 10px;
   padding-bottom: 30px;
 }
@@ -1462,7 +1461,6 @@ div.l-content > div.l-separator:nth-of-type(4) {
   display: none;
   font-size: 11px;
   font-weight: bold;
-  letter-spacing: 3px;
   margin-top: 36px;
   text-transform: uppercase;
   margin-bottom: 14px;
@@ -1489,7 +1487,6 @@ div.l-content > div.l-separator:nth-of-type(4) {
 .l-unit.l-unit--outdated .l-unit__date {
   color: #d24c4c;
   font-size: 10px;
-  letter-spacing: 3px;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -1530,7 +1527,6 @@ div.l-content > div.l-separator:nth-of-type(4) {
 .l-unit__ip {
   margin-bottom: 26px;
   font-size: 12px;
-  letter-spacing: 1px;
 }
 .l-unit__ip span {
   padding-left: 3px;
@@ -1538,7 +1534,6 @@ div.l-content > div.l-separator:nth-of-type(4) {
 }
 .display-ip {
   font-size: 12px;
-  letter-spacing: 1px;
 }
 .display-ip span {
   padding-left: 3px;
@@ -2593,7 +2588,6 @@ a.vst-text:active b{
   border-bottom: 1px solid #2c9491;
   color: #2c9491;
   font-size: 11px;
-  letter-spacing: 1px;
   padding: 2px 2px 0;
   text-decoration: none;
   text-transform: uppercase;
@@ -2621,7 +2615,6 @@ a.vst-text:active b{
   border-bottom: none;
   color: #2c9491;
   font-size: 10px;
-  letter-spacing: 1px;
   padding: 2px 2px 0;
   text-decoration: none;
   text-transform: uppercase;
@@ -2645,7 +2638,6 @@ a.vst-text:active b{
   color: #2C9491;
   border-bottom: 1px solid #2C9491;
   font-size: 11px;
-  letter-spacing: 1px;
   cursor: pointer;
   text-transform: uppercase;
   font-weight: bold;
@@ -2826,13 +2818,11 @@ a.button.cancel {
 .data-active b {
   color: #27AAE1;
   font-size: 11px;
-  letter-spacing: 1px;
   text-transform: uppercase;
 }
 .data-suspended b {
   color: #A3A3A3;
   font-size: 11px;
-  letter-spacing: 3px;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -2840,7 +2830,6 @@ a.button.cancel {
   font-weight: normal;
   color: #777;
   font-size: 12px;
-  letter-spacing: 1px;
   line-height: 23px;
 }
 .data-dotted {
@@ -3139,7 +3128,6 @@ form#vstobjects.suspended {
   display: inline-block;
   float: left;
   font-size: 11px;
-  letter-spacing: 3px;
 }
 .shortcuts .close {
   background: url("/images/sprite.png?1446554103") repeat scroll -408px -469px;
