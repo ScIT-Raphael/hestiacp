@@ -55,4 +55,4 @@ Hestia is licensed under [GPL v3](https://github.com/hestiacp/hestiacp/blob/mast
 
 Donations
 ----------------------------
-Hestia Control Panel is open source and completely free for all to use and enjoy!<br>If you would like to make a donation to help cover development and infrastructure costs, you may do so via PayPal.<br><br>Please see the Donations section at https://github.com/hestiacp/hestiacp/ for more information. 
+Hestia Control Panel is open source and completely free for all to use and enjoy!<br>If you would like to make a donation to help cover development and infrastructure costs, you may do so via PayPal.<br><br>Please see the Donations section at https://github.com/hestiacp/hestiacp/ for more information.
