@@ -58,6 +58,8 @@ heal_ip6tables_links() {
 # prints "CHAIN NETWORK". A single host usually owns a complete /64, so a ban
 # covers the whole network (FIREWALL_IPV6_BAN_PREFIX, default 64) unless the
 # network contains an address of this server or an excluded address.
+# Addresses in ::/80 (IPv4-mapped ::ffff:a.b.c.d, loopback) are never widened:
+# their "network" would be ::/64, which contains ::1.
 get_ipv6_ban_networks() {
 	local prefix="${FIREWALL_IPV6_BAN_PREFIX:-64}"
 	local protected
@@ -86,7 +88,10 @@ get_ipv6_ban_networks() {
 		while (($line = fgets(STDIN)) !== false) {
 			[$chain, $address] = array_pad(preg_split("/\s+/", trim($line)), 2, "");
 			$binary = @inet_pton($address);
-			if ($prefix == 128 || $binary === false || strlen($binary) != 16 || in_array($binary & $mask, $protected, true)) {
+			$single = $prefix == 128 || $binary === false || strlen($binary) != 16
+				|| strncmp($binary, str_repeat("\x00", 10), 10) === 0
+				|| in_array($binary & $mask, $protected, true);
+			if ($single) {
 				echo "$chain $address\n";
 			} else {
 				echo $chain . " " . inet_ntop($binary & $mask) . "/" . $prefix . "\n";

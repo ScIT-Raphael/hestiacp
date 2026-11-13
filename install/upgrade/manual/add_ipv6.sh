@@ -39,11 +39,14 @@ nic="$(ip -6 -d -j route show | jq -r '.[] | if .dst == "default" then .dev else
 if [ -z "$nic" ]; then
 	nic="$(ip -d -j route show | jq -r '.[] | if .dst == "default" then .dev else empty end' | head -n1)"
 fi
-ipv6="$(ip -6 -d -j addr show "$nic" | jq -r '.[] | select(length > 0) | .addr_info[] | select(.scope == "global" and .temporary != true and .deprecated != true) | .local' | head -n1)"
+# Unique local addresses (fc00::/7) are not reachable from the internet:
+# domains would get AAAA records nobody can connect to
+ipv6="$(ip -6 -d -j addr show "$nic" | jq -r '.[] | select(length > 0) | .addr_info[] | select(.scope == "global" and .temporary != true and .deprecated != true and (.local | test("^f[cd]"; "i") | not)) | .local' | head -n1)"
 prefix="$(ip -6 -d -j addr show "$nic" | jq -r --arg IP "$ipv6" '.[].addr_info[] | select(.local == $IP) | .prefixlen' | head -n1)"
 
 if [ -z "$ipv6" ]; then
-	echo "Error: no global IPv6 address found on interface $nic"
+	echo "Error: no public IPv6 address found on interface $nic"
+	echo "       Unique local addresses (fc00::/7) are skipped, add one with v-add-sys-ip if it is intended"
 	exit 1
 fi
 
@@ -94,7 +97,12 @@ if [ "$assign_domains" = 'yes' ]; then
 				continue
 			fi
 			echo "[ * ] Assigning $ipv6 to $domain ($user)..."
-			$BIN/v-change-web-domain-ipv6 "$user" "$domain" "$ipv6" 'no'
+			# No AAAA records for a domain that does not listen on IPv6
+			# (suspended domains for example)
+			if ! $BIN/v-change-web-domain-ipv6 "$user" "$domain" "$ipv6" 'no'; then
+				echo "[ ! ] $domain ($user) was not changed, skipping its DNS zone"
+				continue
+			fi
 			if $BIN/v-list-dns-domain "$user" "$domain" plain > /dev/null 2>&1; then
 				$BIN/v-change-dns-domain-ipv6 "$user" "$domain" "$ipv6" 'no'
 			fi

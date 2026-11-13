@@ -335,8 +335,11 @@ add_web_config() {
 			-e "s|%ssl_ca%|$ssl_ca|g" \
 			> $conf
 
-	add_web_config_ipv6_listen "$conf" "$tpl_ip" "$tpl_ipv6"
+	# http2 first: it rewrites listen lines by using them as sed pattern, which
+	# does not match the brackets of an IPv6 address. The IPv6 lines are then
+	# copied from the already converted IPv4 lines.
 	process_http2_directive "$conf"
+	add_web_config_ipv6_listen "$conf" "$tpl_ip" "$tpl_ipv6"
 
 	chown root:$user $conf
 	chmod 640 $conf
@@ -1022,8 +1025,11 @@ add_webmail_config() {
 			-e "s|%ssl_ca%|$ssl_ca|g" \
 			> $conf
 
-	add_web_config_ipv6_listen "$conf" "$tpl_ip" "$tpl_ipv6"
+	# http2 first: it rewrites listen lines by using them as sed pattern, which
+	# does not match the brackets of an IPv6 address. The IPv6 lines are then
+	# copied from the already converted IPv4 lines.
 	process_http2_directive "$conf"
+	add_web_config_ipv6_listen "$conf" "$tpl_ip" "$tpl_ipv6"
 
 	chown root:$user $conf
 	chmod 640 $conf

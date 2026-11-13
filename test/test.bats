@@ -386,6 +386,21 @@ function check_ip_not_banned(){
     assert_failure $E_INVALID
 }
 
+@test "IPv6: is_ipv6_cidr_format_valid accepts address and network" {
+    for cidr in '2001:db8::1' '2001:db8::/64' '2001:db8::1/128' '::/0'; do
+        run is_ipv6_cidr_format_valid "$cidr"
+        assert_success
+        refute_output
+    done
+}
+
+@test "IPv6: is_ipv6_cidr_format_valid rejects invalid prefix" {
+    for cidr in '2001:db8::/' '2001:db8::/-1' '2001:db8::/129' '2001:db8::/64/64' '2001:db8::/6x' '2001:db8::/ 64' '::/0;touch /tmp/hestia-ipv6-test;'; do
+        run is_ipv6_cidr_format_valid "$cidr"
+        assert_failure $E_INVALID
+    done
+}
+
 #----------------------------------------------------------#
 #                         User                             #
 #----------------------------------------------------------#
@@ -1149,6 +1164,23 @@ function check_ip_not_banned(){
     # Dual-stack: IPv4 and IPv6 listen directives
     assert_file_contains "$HOMEDIR/$user/conf/web/$ipv6domain/nginx.conf" "198.18.0.125:"
     assert_file_contains "$HOMEDIR/$user/conf/web/$ipv6domain/nginx.conf" "[2001:db8:2::20]:"
+}
+
+@test "WEB: ipv6 usage counters match the complete address" {
+    # 2001:db8:2::2 is a part of 2001:db8:2::20, which the domain uses
+    run v-add-sys-ip "2001:db8:2::2" 64 $interface $user
+    assert_success
+    refute_output
+
+    run v-update-sys-ip-counters
+    assert_success
+    assert_file_contains $HESTIA/data/ips/2001:db8:2::2 "U_WEB_DOMAINS='0'"
+    assert_file_contains $HESTIA/data/ips/2001:db8:2::20 "U_WEB_DOMAINS='1'"
+
+    # An unused address can be deleted
+    run v-delete-sys-ip "2001:db8:2::2"
+    assert_success
+    refute_output
 }
 
 @test "WEB: Add ssl to ipv6 web domain" {
@@ -2709,6 +2741,58 @@ echo   "1.2.3.4" >> $HESTIA/data/firewall/excludes.conf
   run v-delete-firewall-rule-ipv6 '101'
   assert_success
   refute_output
+}
+
+@test "Firewall: ipv6 firewall rule rejects shell characters in the source" {
+  rm -f /tmp/hestia-ipv6-test
+  run v-add-firewall-rule-ipv6 'ACCEPT' '::/0;touch /tmp/hestia-ipv6-test;' '2222' 'TCP'
+  assert_failure $E_INVALID
+  assert_file_not_exist /tmp/hestia-ipv6-test
+
+  run v-add-firewall-rule-ipv6 'ACCEPT' '2001:db8::/-1' '2222' 'TCP'
+  assert_failure $E_INVALID
+}
+
+@test "Firewall: ipv6 firewall skips an invalid source in rules6.conf" {
+  [ ! -f "$HESTIA/data/firewall/rules6.conf" ] && skip
+  [ ! -d /proc/sys/net/ipv6 ] && skip
+
+  # A rule that did not pass validation (edited by hand, restored, ...) must
+  # never reach the script that applies the rules as root
+  rm -f /tmp/hestia-ipv6-test
+  echo "RULE='102' ACTION='ACCEPT' PROTOCOL='TCP' PORT='2222' IP6='::/0;touch /tmp/hestia-ipv6-test;' COMMENT='' SUSPENDED='no' TIME='00:00:00' DATE='2025-01-01'" >> "$HESTIA/data/firewall/rules6.conf"
+  run v-update-firewall-ipv6
+  sed -i "/^RULE='102' /d" "$HESTIA/data/firewall/rules6.conf"
+  assert_file_not_exist /tmp/hestia-ipv6-test
+
+  run ip6tables -S INPUT
+  refute_output --partial "--dport 2222"
+
+  run v-update-firewall-ipv6
+  assert_success
+}
+
+@test "Firewall: ipv6 firewall allows the DHCPv6 client" {
+  [ ! -f "$HESTIA/data/firewall/rules6.conf" ] && skip
+  [ ! -d /proc/sys/net/ipv6 ] && skip
+
+  run v-update-firewall-ipv6
+  assert_success
+
+  # Replies of the DHCPv6 server are not ESTABLISHED (multicast request)
+  run ip6tables -S INPUT
+  assert_success
+  assert_output --partial "-s fe80::/10 -p udp -m udp --dport 546 -j ACCEPT"
+}
+
+@test "Firewall: ipv4-mapped ipv6 ban is not widened to ::/64" {
+  run bash -c "source /etc/hestiacp/hestia.conf; source \$HESTIA/func/main.sh; source \$HESTIA/func/firewall.sh; echo 'MAIL ::ffff:192.0.2.1' | get_ipv6_ban_networks"
+  assert_success
+  assert_output 'MAIL ::ffff:192.0.2.1'
+
+  run bash -c "source /etc/hestiacp/hestia.conf; source \$HESTIA/func/main.sh; source \$HESTIA/func/firewall.sh; echo 'MAIL 2001:db8:1:2::bad' | get_ipv6_ban_networks"
+  assert_success
+  assert_output 'MAIL 2001:db8:1:2::/64'
 }
 
 #----------------------------------------------------------#

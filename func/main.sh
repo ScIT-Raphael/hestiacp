@@ -1391,7 +1391,9 @@ is_ipv4_cidr_format_valid() {
 
 is_ipv6_cidr_format_valid() {
 	object_name=${2-ipv6}
-	valid=$($HESTIA_PHP -r '$cidr=$argv[1]; list($ip, $netmask) = [...explode("/", $cidr), 128]; echo ((filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && $netmask <= 128) ? 0 : 1);' "$1")
+	# The prefix has to be digits only: a loose "<= 128" compares strings for
+	# non-numeric input and lets values like "::/0;command" or "::/-1" through
+	valid=$($HESTIA_PHP -r '[$ip, $net] = [...explode("/", $argv[1], 2), "128"]; echo (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && preg_match("/^\d{1,3}$/", $net) && $net <= 128) ? 0 : 1;' "$1")
 	if [ "$valid" -ne 0 ]; then
 		check_result "$E_INVALID" "invalid $object_name :: $1"
 	fi

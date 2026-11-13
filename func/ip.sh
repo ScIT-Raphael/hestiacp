@@ -149,7 +149,7 @@ decrease_ip_value() {
 	fi
 
 	new_web=$((current_web - 1))
-	check_ip=$(grep $sip $USER_DATA/web.conf | wc -l)
+	check_ip=$(grep -c -F -e " IP='$sip'" -e " IP6='$sip'" $USER_DATA/web.conf)
 	if [[ $check_ip = 0 ]]; then
 		new_usr=$(echo "$current_usr" \
 			| sed "s/,/\n/g" \
